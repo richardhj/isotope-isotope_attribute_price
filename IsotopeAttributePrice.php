@@ -101,6 +101,7 @@ class IsotopeAttributePrice extends Frontend
 				elseif (isset($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$field]) && !empty(($operator = $GLOBALS['TL_DCA']['tl_iso_products']['fields'][$field]['attributes']['calculation_operator'])))
 				{
 					$attrPrice = floatval($objSource->getOptions(true)[$field]);
+					$attrPrice = max(0, $attrPrice);
 
 					if (!$attrPrice)
 					{
@@ -251,7 +252,7 @@ class IsotopeAttributePrice extends Frontend
 
 
 	/**
-	 * Add the price attribute to the variant attributes no matter what
+	 * Add a div container to price attribute so it is ajax replaceable
 	 *
 	 * @param string         $attribute
 	 * @param mixed          $varValue
@@ -273,7 +274,13 @@ class IsotopeAttributePrice extends Frontend
 
 			if (!$arrType['variants'] || !in_array($attribute, $arrVariantAttributes))
 			{
-				return $objProduct->variants . $strBuffer;
+				return sprintf
+				(
+					'<div class="iso_attribute %1$s" id="%2$s_%1$s">%3$s</div>',
+					$attribute,
+					$objProduct->formSubmit,
+					$strBuffer
+				);
 			}
 		}
 
