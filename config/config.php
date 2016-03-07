@@ -30,7 +30,7 @@
 /**
  * Hook to add ajax upload option
  */
-$GLOBALS['ISO_HOOKS']['calculatePrice'][] = array('IsotopeAttributePrice', 'attributePrice');
+$GLOBALS['ISO_HOOKS']['calculatePrice'][] = array('IsotopeAttributePrice', 'calculatePrice');
 
 // Makes price adjustable by js in case not a variant product
 $GLOBALS['ISO_HOOKS']['generateAttribute'][] = array('IsotopeAttributePrice', 'addPriceToVariants');
