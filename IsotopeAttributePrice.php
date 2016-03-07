@@ -194,7 +194,7 @@ class IsotopeAttributePrice extends Frontend
 			$arrVariantAttributes = $arrType['variants'] ? deserialize($arrType['variant_attributes']) : array();
 			if (!$arrType['variants'] || !in_array($attribute, $arrVariantAttributes))
 			{
-				return $objProduct->variants . '<div class="iso_attribute ' . $attribute . '" id="' . $objProduct->formSubmit . '_' . $attribute . '">' . $strBuffer . '</div>';
+				return $objProduct->variants . $strBuffer;
 			}
 		}
 		return $strBuffer;
