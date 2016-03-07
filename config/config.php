@@ -26,11 +26,6 @@
  * @license    LGPL
  */
 
-/**
- * Form fields
- */
-$GLOBALS['BE_FFL']['optionPriceWizard'] = 'OptionPriceWizard';
-
 
 /**
  * Hook to add ajax upload option
