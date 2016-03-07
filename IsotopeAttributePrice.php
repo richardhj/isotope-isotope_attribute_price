@@ -62,19 +62,36 @@ class IsotopeAttributePrice extends Frontend
 					if (($optionsKey !== false) && isset($arrOptions[$optionsKey]['price']))
 					{
 						$operator = substr($arrOptions[$optionsKey]['price'], 0, 1);
-						$operator = preg_replace('/[^+-]/', '', $operator);
+						$operator = preg_replace('/[^+-*/]/', '', $operator);
 						$isPercentage = preg_match('/^.+%$/', $arrOptions[$optionsKey]['price']);
 						$attrPrice = floatval(preg_replace('/[^0-9,\.]/', '', $arrOptions[$optionsKey]['price']));
 
 						switch ($operator)
 						{
 							case '-':
-								$fltPrice = ($isPercentage ? $fltPrice * (1 - ($attrPrice / 100)) : $fltPrice - $attrPrice);
+								$fltPrice = $isPercentage
+									? $fltPrice * (1 - ($attrPrice / 100))
+									: $fltPrice - $attrPrice;
+								break;
+
+							case '*':
+								$fltPrice = $isPercentage
+									? $fltPrice * ($fltPrice / 100 * $attrPrice)
+									: $fltPrice * $attrPrice;
+								break;
+
+							case '/':
+								$fltPrice = $isPercentage
+									? $fltPrice / ($fltPrice / 100 * $attrPrice)
+									: $fltPrice / $attrPrice;
 								break;
 
 							case '+':
 							default:
-								$fltPrice = ($isPercentage ? $fltPrice * (1 + ($attrPrice / 100)) : $fltPrice + $attrPrice);
+								$fltPrice = $isPercentage
+									? $fltPrice * (1 + ($attrPrice / 100))
+									: $fltPrice + $attrPrice;
+								break;
 						}
 					}
 				}
