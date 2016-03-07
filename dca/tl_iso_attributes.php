@@ -21,13 +21,20 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
+ *
  * @copyright  Ruud Walraven 2010
  * @author     Ruud Walraven <ruud.walraven@gmail.com>
  * @license    LGPL
  */
 
 /**
- * Table tl_iso_attributes
+ * Palettes
+ */
+$GLOBALS['TL_DCA']['tl_iso_attributes']['palettes']['text'] = str_replace(',datepicker', ',datepicker,calculation_operator', $GLOBALS['TL_DCA']['tl_iso_attributes']['palettes']['text']);
+
+
+/**
+ * Fields
  */
 array_insert($GLOBALS['TL_DCA']['tl_iso_attributes']['fields']['options']['eval']['columnFields'], 2, array
 (
@@ -38,3 +45,11 @@ array_insert($GLOBALS['TL_DCA']['tl_iso_attributes']['fields']['options']['eval'
 		'eval'      => array('class' => 'tl_text_2'),
 	),
 ));
+
+$GLOBALS['TL_DCA']['tl_iso_attributes']['fields']['calculation_operator'] = array
+(
+	'label'     => &$GLOBALS['TL_LANG']['tl_iso_attributes']['calculation_operator'],
+	'inputType' => 'select',
+	'options'   => array('+', '-', '*', '/'),
+	'eval'      => array('includeBlankOption' => true)
+);

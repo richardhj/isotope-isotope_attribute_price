@@ -42,13 +42,15 @@ class IsotopeAttributePrice extends Frontend
 	{
 		if ($objSource instanceof IsotopeProduct)
 		{
-			foreach ($objSource->getAttributes() as $field => $value)
+			/**
+			 * @var string $field
+			 * @var mixed  $attribute
+			 */
+			foreach ($objSource->getAttributes() as $field => $attribute)
 			{
 				// It's a input type with options (like select, radio button)
-				if (isset($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$field]) && !empty($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$field]['attributes']['options']))
+				if (isset($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$field]) && !empty($arrOptions = deserialize($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$field]['attributes']['options'])))
 				{
-					$arrOptions = deserialize($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$field]['attributes']['options']);
-
 					if ($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$field]['attributes']['customer_defined'])
 					{
 						$arrUserOptions = $objSource->getOptions(true);
@@ -56,13 +58,13 @@ class IsotopeAttributePrice extends Frontend
 					}
 					else
 					{
-						$optionsKey = static::searchForValueInArrayAndGetIndex($arrOptions, 'value', $value);
+						$optionsKey = static::searchForValueInArrayAndGetIndex($arrOptions, 'value', $attribute);
 					}
 
 					if (($optionsKey !== false) && isset($arrOptions[$optionsKey]['price']))
 					{
 						$operator = substr($arrOptions[$optionsKey]['price'], 0, 1);
-						$operator = preg_replace('/[^+-*/]/', '', $operator);
+						$operator = preg_replace('/[^\+\-\*\/]/', '', $operator);
 						$isPercentage = preg_match('/^.+%$/', $arrOptions[$optionsKey]['price']);
 						$attrPrice = floatval(preg_replace('/[^0-9,\.]/', '', $arrOptions[$optionsKey]['price']));
 
@@ -95,6 +97,34 @@ class IsotopeAttributePrice extends Frontend
 						}
 					}
 				}
+				// It's a text input with a numeric value which should be calculated with the original price
+				elseif (isset($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$field]) && !empty(($operator = $GLOBALS['TL_DCA']['tl_iso_products']['fields'][$field]['attributes']['calculation_operator'])))
+				{
+					$attrPrice = floatval($objSource->getOptions(true)[$field]);
+
+					if (!$attrPrice)
+					{
+						continue;
+					}
+
+					switch ($operator)
+					{
+						case '+':
+							$fltPrice = $fltPrice + $attrPrice;
+							break;
+
+						case '-':
+							$fltPrice = $fltPrice - $attrPrice;
+							break;
+						case '*':
+							$fltPrice = $fltPrice * $attrPrice;
+							break;
+						case '/':
+							$fltPrice = $fltPrice / $attrPrice;
+							break;
+					}
+				}
+
 			}
 		}
 
@@ -200,7 +230,7 @@ class IsotopeAttributePrice extends Frontend
 			// Only add user defined attributes that aren't in the js line already (like variant options)
 			if ($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$attribute]['attributes']['customer_defined']
 				&& !$GLOBALS['TL_DCA']['tl_iso_products']['fields'][$attribute]['attributes']['variant_option']
-				&& !empty($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$attribute]['attributes']['options'])
+				&& (!empty($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$attribute]['attributes']['options'] || !empty($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$attribute]['attributes']['calculation_operator'])))
 			)
 			{
 				$arrAjaxOptions[] = $attribute;
